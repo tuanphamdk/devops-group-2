@@ -1,5 +1,10 @@
 # DevOps Base Project
 
+## Group member
+- Nguyen Tien Dat
+- Nguyen Huu Duc
+- Hoang Anh Minh
+
 ## Project Overview
 
 This is a simple Todo application with:
