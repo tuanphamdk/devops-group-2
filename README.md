@@ -35,12 +35,12 @@ The codebase contains **intentional bugs** that you need to identify and fix:
 
 ### Task 1: Fix Backend Bugs (server.js)
 
-- [ ] Bug #1: Wrong default password
-- [ ] Bug #2: Missing validation for empty title
-- [ ] Bug #3: Missing DELETE endpoint
-- [ ] Bug #4: Missing PUT endpoint
-- [ ] Bug #5: Server starts in test mode
-- [ ] Bug #6: App not exported for tests
+- [x] Bug #1: Wrong default password
+- [x] Bug #2: Missing validation for empty title
+- [x] Bug #3: Missing DELETE endpoint
+- [x] Bug #4: Missing PUT endpoint
+- [x] Bug #5: Server starts in test mode
+- [x] Bug #6: App not exported for tests
 
 ### Task 2: Complete Dockerfiles
 
