@@ -69,6 +69,28 @@ The codebase contains **intentional bugs** that you need to identify and fix:
 - [x] Document required secrets
 - [x] Configure PR review requirements
 
+## Task 5: GitHub Setup Guide (Manual Steps)
+
+To fully complete Task 5 and prepare for your presentation, please perform these steps in the GitHub UI:
+
+### 1. Branch Protection
+
+- Go to **Settings > Branches > Add branch protection rule**.
+- Branch name pattern: `main` (or `master`).
+- Check: **Require a pull request before merging**.
+- Check: **Require approvals** (set to 1).
+- Check: **Require status checks to pass before merging** (select `test`).
+
+### 2. GitHub Secrets
+
+Go to **Settings > Secrets and variables > Actions** and add:
+
+- `DOCKER_HUB_USERNAME`: Your Docker Hub username.
+- `DOCKER_HUB_TOKEN`: Use a Personal Access Token from Docker Hub.
+- `HOST`: Your production server IP.
+- `USERNAME`: Your server SSH username.
+- `SSH_PRIVATE_KEY`: Your server SSH private key.
+
 ## Testing Locally
 
 ```bash
