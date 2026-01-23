@@ -1,6 +1,6 @@
 # DevOps Base Project
 # Group Members
-- Nguyen Huu Duc
+- Nguyen Huu Duc.
 
 ## Project Overview
 
