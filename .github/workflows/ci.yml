@@ -7,17 +7,15 @@ on:
     branches: [main, master]
 
 jobs:
-  test:
-    name: Build & Test
+  build-and-test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: tododb
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tododb
         ports:
           - 5432:5432
         options: >-
@@ -27,65 +25,74 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-node-version: "18"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install Backend Dependencies
         run: |
           cd backend
           npm ci
 
-      - name: Run backend tests
+      - name: Run Backend Tests
         env:
           DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: tododb
           DB_USER: postgres
           DB_PASSWORD: postgres
+          DB_NAME: tododb
+          DB_PORT: 5432
         run: |
           cd backend
           npm test
 
-  docker-build:
-    name: Docker Build & Push
-    needs: test
-    runs-on: ubuntu-latest
+  docker-build-push:
+    needs: build-and-test
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Build Backend Image
-        run: docker build -t ${{ github.repository }}-backend:latest ./backend
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Frontend Image
-        run: docker build -t ${{ github.repository }}-frontend:latest ./frontend
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/devops-project-backend:latest
 
-      # Note: Actual push to Docker Hub would happen here if secrets were configured:
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # - name: Push Backend
-      #   run: docker push ${{ github.repository }}-backend:latest
-      # - name: Push Frontend
-      #   run: docker push ${{ github.repository }}-frontend:latest
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/devops-project-frontend:latest
 
   deploy:
-    name: Deploy (Placeholder)
-    needs: docker-build
-    runs-on: ubuntu-latest
+    needs: docker-build-push
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploying...
-        run: echo "Deployment step goes here. Requires server SSH configuration."
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Ensure directory exists and clone if not present (optional robustness)
+            [ ! -d "~/devops-project" ] && git clone https://github.com/${{ github.repository }} ~/devops-project
+
+            cd ~/devops-project
+            git pull
+            docker-compose pull
+            docker-compose up -d

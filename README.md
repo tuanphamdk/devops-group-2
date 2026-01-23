@@ -58,10 +58,10 @@ The codebase contains **intentional bugs** that you need to identify and fix:
 
 ### Task 4: Create CI/CD Pipeline
 
-- [ ] Create `.github/workflows/ci.yml`
-- [ ] Configure build-and-test job with PostgreSQL service
-- [ ] Configure Docker build and push to Docker Hub
-- [ ] Configure deploy job with SSH
+- [x] Create `.github/workflows/ci.yml`
+- [x] Configure build-and-test job with PostgreSQL service
+- [x] Configure Docker build and push to Docker Hub
+- [x] Configure deploy job with SSH
 
 ### Task 5: GitHub Configuration
 
