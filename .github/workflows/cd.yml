@@ -1,0 +1,38 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to project directory
+            cd ~/devops-project || exit 1
+            
+            # Pull latest images from Docker Hub
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group1-frontend:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group1-backend:latest
+            
+            # Stop and remove existing containers
+            docker-compose down
+            
+            # Start containers with new images
+            docker-compose up -d
+            
+            # Clean up unused images
+            docker image prune -f
+            
+            # Verify deployment
+            docker-compose ps
