@@ -22,4 +22,38 @@
 # - Research: "Docker multi-stage React production"
 # ===========================================
 
-# YOUR CODE HERE:
+# Stage 1: Build stage
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (using npm install because of lockfile issues earlier, but npm ci is preferred if lockfile is consistent)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build the React app
+RUN npm run build
+
+# Stage 2: Production stage
+FROM node:18-alpine
+
+# Install 'serve' package globally
+RUN npm install -g serve
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the build folder from builder stage
+COPY --from=builder /app/build ./build
+
+# Expose port 3000
+EXPOSE 3000
+
+# Use serve to run the app
+CMD ["serve", "-s", "build", "-l", "3000"]
