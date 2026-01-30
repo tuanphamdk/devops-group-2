@@ -40,21 +40,28 @@
 version: '3.8'
 
 services:
-  # STUDENT TODO: Define frontend service
-  frontend:
-    build: ./frontend
-    # TODO: Add ports, depends_on
+  app:
+    build: .
+    ports:
+      - "8080:3000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=myuser
+      - DB_PASSWORD=mypass
+      - DB_NAME=mydatabase
+    depends_on:
+      - db
 
-  # STUDENT TODO: Define backend service
-  backend:
-    build: ./backend
-    # TODO: Add ports, environment, depends_on, healthcheck
+  db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
-  # STUDENT TODO: Define postgres service
-  postgres:
-    image: postgres:15-alpine
-    # TODO: Add environment, ports, volumes, healthcheck
-
-# STUDENT TODO: Define named volumes
 volumes:
-  postgres_data:
+  db-data:
