@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Production build (will be created in container)
+build
+dist
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+
+# Testing
+coverage
+*.test.js
+*.spec.js
+__tests__
+
+# Documentation
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Misc
+.eslintcache
