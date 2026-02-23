@@ -1,7 +1,27 @@
 const request = require('supertest');
+const { Pool } = require('pg');
 const app = require('../server');
 
+// Create a test database connection
+const pool = new Pool({
+   user: process.env.DB_USER || 'postgres',
+   host: process.env.DB_HOST || 'localhost',
+   database: process.env.DB_NAME || 'tododb',
+   password: process.env.DB_PASSWORD || 'postgres',
+   port: process.env.DB_PORT || 5432,
+});
+
 describe('Todos API', () => {
+   // Clean up database before each test
+   beforeEach(async () => {
+      await pool.query('DELETE FROM todos');
+   });
+
+   // Close database connection after all tests
+   afterAll(async () => {
+      await pool.end();
+   });
+
    // Test 1: Health check
    it('GET /health should return healthy status', async () => {
       const res = await request(app).get('/health');

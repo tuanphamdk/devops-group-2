@@ -1,5 +1,5 @@
 # ===========================================
-# Multi-Stage Dockerfile for Backend
+# Multi-Stage build
 # ===========================================
 
 # Stage 1: Builder
