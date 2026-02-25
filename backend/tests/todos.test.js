@@ -1,7 +1,27 @@
 const request = require('supertest');
+const { Pool } = require('pg');
 const app = require('../server');
 
+// Create a test database connection
+const pool = new Pool({
+   user: process.env.DB_USER || 'postgres',
+   host: process.env.DB_HOST || 'localhost',
+   database: process.env.DB_NAME || 'tododb',
+   password: process.env.DB_PASSWORD || 'postgres',
+   port: process.env.DB_PORT || 5432,
+});
+
 describe('Todos API', () => {
+   // Clean up database before each test
+   beforeEach(async () => {
+      await pool.query('DELETE FROM todos');
+   });
+
+   // Close database connection after all tests
+   afterAll(async () => {
+      await pool.end();
+   });
+
    // Test 1: Health check
    it('GET /health should return healthy status', async () => {
       const res = await request(app).get('/health');
@@ -33,7 +53,7 @@ describe('Todos API', () => {
          .post('/api/todos')
          .send({});  // Missing title
 
-      expect(res.status).toBe(400);  // Will FAIL - returns 201!
+      expect(res.status).toBe(400);  // Fixed: Now returns 400 for missing title
       expect(res.body.error).toMatch(/title/i);
    });
 
@@ -43,7 +63,7 @@ describe('Todos API', () => {
          .post('/api/todos')
          .send({ title: '   ' });  // Only whitespace
 
-      expect(res.status).toBe(400);  // Will FAIL!
+      expect(res.status).toBe(400);  // Fixed: Now returns 400 for whitespace-only title
       expect(res.body.error).toMatch(/title/i);
    });
 
@@ -60,7 +80,7 @@ describe('Todos API', () => {
       const deleteRes = await request(app)
          .delete(`/api/todos/${todoId}`);
 
-      expect(deleteRes.status).toBe(200);  // Will FAIL - 404!
+      expect(deleteRes.status).toBe(200);  // Fixed: DELETE endpoint implemented
    });
 
    // BROKEN TEST #4 - PUT endpoint not implemented!
@@ -77,7 +97,7 @@ describe('Todos API', () => {
          .put(`/api/todos/${todoId}`)
          .send({ title: 'Updated title', completed: true });
 
-      expect(updateRes.status).toBe(200);  // Will FAIL - 404!
+      expect(updateRes.status).toBe(200);  // Fixed: PUT endpoint implemented
       expect(updateRes.body.title).toBe('Updated title');
       expect(updateRes.body.completed).toBe(true);
    });
