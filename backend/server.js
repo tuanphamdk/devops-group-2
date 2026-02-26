@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const helmet = require('helmet');
+require('dotenv').config();
 
 const app = express();
 app.use(helmet());
@@ -13,7 +14,7 @@ const pool = new Pool({
    user: process.env.DB_USER || 'postgres',
    host: process.env.DB_HOST || 'localhost',
    database: process.env.DB_NAME || 'tododb',
-   password: process.env.DB_PASSWORD || 'wrongpassword',
+   password: process.env.DB_PASSWORD || 'postgres123',
    port: process.env.DB_PORT || 5432,
 });
 
@@ -38,8 +39,12 @@ app.post('/api/todos', async (req, res) => {
       const { title, completed = false } = req.body;
 
       // STUDENT FIX: Add validation here!
+      if (!title || title.trim() === '') {
+         return res.status(400).json({ error: 'Title is required and cannot be empty' });
+      }
       // Hint: Check if title is empty or undefined
       // Return 400 status with error message if invalid
+      
 
       const result = await pool.query(
          'INSERT INTO todos(title, completed) VALUES($1, $2) RETURNING *',
@@ -53,17 +58,62 @@ app.post('/api/todos', async (req, res) => {
 
 // BUG #3: Missing DELETE endpoint - but test expects it!
 // STUDENT TODO: Implement DELETE /api/todos/:id endpoint
+// DELETE todo
+app.delete('/api/todos/:id', async (req, res) => {
+   try {
+      const { id } = req.params;
+      const result = await pool.query('DELETE FROM todos WHERE id = $1 RETURNING *', [id]);
+
+      if (result.rows.length === 0) {
+         return res.status(404).json({ error: 'Todo not found' });
+      }
+
+      res.status(200).json(result.rows[0]);
+   } catch (err) {
+      res.status(500).json({ error: err.message });
+   }
+});
 
 // BUG #4: Missing PUT endpoint for updating todos
 // STUDENT TODO: Implement PUT /api/todos/:id endpoint
+// PUT todo - update title and/or completed status
+app.put('/api/todos/:id', async (req, res) => {
+   try {
+      const { id } = req.params;
+      const { title, completed } = req.body;
+
+      const result = await pool.query(
+         'UPDATE todos SET title = $1, completed = $2 WHERE id = $3 RETURNING *',
+         [title, completed, id]
+      );
+
+      if (result.rows.length === 0) {
+         return res.status(404).json({ error: 'Todo not found' });
+      }
+
+      res.json(result.rows[0]);
+   } catch (err) {
+      res.status(500).json({ error: err.message });
+   }
+});
 
 const port = process.env.PORT || 8080;
 
 // BUG #5: Server starts even in test mode, causing port conflicts
 // STUDENT FIX: Only start server if NOT in test mode
-app.listen(port, () => {
-   console.log(`Backend running on port ${port}`);
-});
+// app.listen(port, () => {
+//    console.log(`Backend running on port ${port}`);
+// });
+// Only start server if NOT in test mode
+if (process.env.NODE_ENV !== 'test') {
+   app.listen(port, () => {
+      console.log(`Backend running on port ${port}`);
+   });
+}
 
 // BUG #6: App not exported - tests can't import it!
 // STUDENT FIX: Export the app module
+
+// Export the app module for testing
+module.exports = app;
+module.exports.pool = pool;
