@@ -2,6 +2,11 @@ const request = require('supertest');
 const app = require('../server');
 
 describe('Todos API', () => {
+   afterAll(async () => {
+      if (app.pool && typeof app.pool.end === 'function') {
+         await app.pool.end();
+      }
+   });
    // Test 1: Health check
    it('GET /health should return healthy status', async () => {
       const res = await request(app).get('/health');
