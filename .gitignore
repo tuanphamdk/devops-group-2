@@ -1,0 +1,45 @@
+# Báo cáo nội bộ
+BUG_FIX_REPORT.md
+*_REPORT.md
+
+# File Lab và tài liệu học tập
+Lab*.pdf
+Lab*.docx
+*.lab
+
+# Node modules
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker volumes data (nếu không dùng named volumes)
+data/
+postgres-data/
