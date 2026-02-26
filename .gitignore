@@ -1,0 +1,69 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+coverage/
+.cache/
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Packages
+*.tgz
+
+# Docker
+docker-compose.override.yml
+
+# Additional common ignores
+# Editor/IDE
+*.sublime-workspace
+*.sublime-project
+
+# Next/Vite/React build outputs
+.next/
+out/
+dist/
+build/
+
+# Parcel
+.cache/
+.parcel-cache/
+
+# Logs and debug
+*.log
+
+# Lock files (if you intentionally want them in repo, remove these)
+# package-lock.json
+# yarn.lock
+
+# Certificates
+*.pem
+
+# Temporary files
+tmp/
+temp/
+
+# Binary artifacts
+*.exe
+*.dll
+*.so
+
