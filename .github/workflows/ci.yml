@@ -64,16 +64,25 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend ./frontend
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend ./backend
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:latest \
+                       -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:${{ github.sha }} \
+                       ./frontend
+
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:latest \
+                       -t ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:${{ github.sha }} \
+                       ./backend
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login \
+              -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
       - name: Push Docker images
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:${{ github.sha }}
+
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:${{ github.sha }}
 
 
   deploy:
