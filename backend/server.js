@@ -101,3 +101,5 @@ if (process.env.NODE_ENV !== 'test') {
 // BUG #6: App not exported - tests can't import it!
 // STUDENT FIX: Export the app module
 module.exports = app;
+
+// ci test
