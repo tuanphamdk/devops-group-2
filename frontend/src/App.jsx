@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 // STUDENT TODO: This API_URL works for local development
 // For Docker, you may need to configure nginx proxy or use container networking
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_URL = process.env.REACT_APP_API_URL || 'https://devops-backend-tskb.onrender.com/';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -40,7 +40,7 @@ function App() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>🚀 DevOps Todo App</h1>
+      <h1>🚀 DevOps Todo App 12345</h1>
       <p>Demo: Watch UI update LIVE after CI/CD! ✨</p>
 
       <div style={{ marginBottom: '20px' }}>
