@@ -41,7 +41,14 @@ jobs:
         run: |
           cd backend
           npm ci
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
+      - name: Initialize database schema
+        run: psql -h localhost -U postgres -d tododb -f database/database.sql
+        env:
+          PGPASSWORD: postgres
+          
       - name: Run backend tests
         env:
           DB_HOST: localhost
