@@ -23,3 +23,20 @@
 # ===========================================
 
 # YOUR CODE HERE:
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./ 
+
+RUN npm install
+
+COPY . .
+
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=builder /app/src ./src
+EXPOSE 8080
+CMD [ "npm", "start" ]
