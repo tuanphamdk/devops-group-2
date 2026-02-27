@@ -114,23 +114,23 @@ app.post('/api/todos', async (req, res) => {
 // STUDENT TODO: Implement DELETE /api/todos/:id endpoint
 
 // DELETE todo
-app.delete('/api/todos/:id', async (req, res) => {
-   try {
-      const { id } = req.params;
-      if (useMemoryDb) {
-         const idx = memDb.todos.findIndex(t => t.id === Number(id));
-         if (idx === -1) return res.status(404).json({ error: 'Todo not found' });
-         memDb.todos.splice(idx, 1);
-         return res.status(200).json({ message: 'Deleted' });
-      }
+// app.delete('/api/todos/:id', async (req, res) => {
+//    try {
+//       const { id } = req.params;
+//       if (useMemoryDb) {
+//          const idx = memDb.todos.findIndex(t => t.id === Number(id));
+//          if (idx === -1) return res.status(404).json({ error: 'Todo not found' });
+//          memDb.todos.splice(idx, 1);
+//          return res.status(200).json({ message: 'Deleted' });
+//       }
 
-      const result = await pool.query('DELETE FROM todos WHERE id = $1 RETURNING *', [id]);
-      if (result.rowCount === 0) return res.status(404).json({ error: 'Todo not found' });
-      return res.status(200).json({ message: 'Deleted' });
-   } catch (err) {
-      res.status(500).json({ error: err.message });
-   }
-});
+//       const result = await pool.query('DELETE FROM todos WHERE id = $1 RETURNING *', [id]);
+//       if (result.rowCount === 0) return res.status(404).json({ error: 'Todo not found' });
+//       return res.status(200).json({ message: 'Deleted' });
+//    } catch (err) {
+//       res.status(500).json({ error: err.message });
+//    }
+// });
 
 // BUG #4: Missing PUT endpoint for updating todos
 // STUDENT TODO: Implement PUT /api/todos/:id endpoint
