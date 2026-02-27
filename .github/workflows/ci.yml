@@ -1,0 +1,111 @@
+name: CI Pipeline
+# Trigger on Pull Requests to main
+on:
+  pull_request:
+    branches: [main]
+env:
+  NODE_VERSION: '18'
+jobs:
+# ============================================
+# Job 1: Build and Test
+# ============================================
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+# PostgreSQL service container for tests
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: todoapp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+  # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+  # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+#          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+  # Step 3: Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm install
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+  # Step 4: Initialize test database
+      - name: Initialize database
+        env:
+          PGPASSWORD: postgres
+        run:
+          psql -h localhost -U postgres -d todoapp_test -f database/database.sql
+  # Step 5: Run backend tests
+      - name: Run backend tests
+        working-directory: ./backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: todoapp_test
+          NODE_ENV: test
+        run: npm test
+  # Step 6: Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  # Step 7: Set up Docker Buildx (for better builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+  # Step 8: Build and push backend image (Standard Docker)
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:pr-${{ github.event.pull_request.number }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:latest
+          cache-to: type=inline
+
+
+  # Step 9: Build and push frontend image (Standard Docker)
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:pr-${{ github.event.pull_request.number }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:latest
+          cache-to: type=inline
+
+  # Step 10: Image size analysis
+      - name: Analyze Docker image sizes
+        run: |
+          echo "Backend image size:"
+          docker images ${{ secrets.DOCKER_HUB_USERNAME }}/devops-backend:latest --format "{{.Size}}"
+          echo "Frontend image size:"
+          docker images ${{ secrets.DOCKER_HUB_USERNAME }}/devops-frontend:latest --format "{{.Size}}"
+
+#help
+#please
+#good lord finally
