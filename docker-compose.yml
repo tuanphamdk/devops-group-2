@@ -39,22 +39,56 @@
 
 version: '3.8'
 
-services:
+services: 
   # STUDENT TODO: Define frontend service
+  # TODO: Add ports, depends_on
   frontend:
     build: ./frontend
-    # TODO: Add ports, depends_on
+    ports:
+      - "3000:3000"
+    depends_on:
+    - backend 
 
   # STUDENT TODO: Define backend service
+  # TODO: Add ports, environment, depends_on, healthcheck
   backend:
     build: ./backend
-    # TODO: Add ports, environment, depends_on, healthcheck
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres_database
+      DB_USER: postgres_user
+      DB_PASSWORD: postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # STUDENT TODO: Define postgres service
+  # TODO: Add environment, ports, volumes, healthcheck
   postgres:
     image: postgres:15-alpine
-    # TODO: Add environment, ports, volumes, healthcheck
+    environment:
+      POSTGRES_DB: postgres_database
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/database.sql:/docker-entrypoint-initdb.d/database.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 # STUDENT TODO: Define named volumes
 volumes:
-  postgres_data:
+  postgres_data: {}
