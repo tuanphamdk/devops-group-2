@@ -49,11 +49,41 @@ services:
   backend:
     build: ./backend
     # TODO: Add ports, environment, depends_on, healthcheck
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USER: postgres
+      DB_HOST: postgres  # Tên service trong docker-compose
+      DB_NAME: tododb
+      DB_PASSWORD: postgres123  # Khớp với postgres service
+      DB_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # STUDENT TODO: Define postgres service
   postgres:
     image: postgres:15-alpine
     # TODO: Add environment, ports, volumes, healthcheck
+    environment:
+      POSTGRES_DB: tododb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123  # Phải khớp với .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/database.sql:/docker-entrypoint-initdb.d/database.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 # STUDENT TODO: Define named volumes
 volumes:
