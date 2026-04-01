@@ -1,4 +1,10 @@
 # DevOps Base Project
+•	Leader:
+Nguyen Trung Kien | GitHub: @tranvanki
+•	Member 1:
+Pham Cao Son| GitHub: @phamcaosongch230287
+•	Member 2:
+Nguyen Quynh Van | GitHub: @fauzt1412
 
 ## Project Overview
 

@@ -1,5 +1,5 @@
--- Database initialization script for PostgreSQL
--- This script runs automatically when the container starts
+-- init.sql: Database initialization script for PostgreSQL
+-- Creates todos table and seeds initial rows
 
 CREATE TABLE IF NOT EXISTS todos (
   id SERIAL PRIMARY KEY,
@@ -13,4 +13,3 @@ INSERT INTO todos (title, completed) VALUES
   ('Setup CI/CD', true),
   ('Deploy to production', false)
 ON CONFLICT DO NOTHING;
-  
