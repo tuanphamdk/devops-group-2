@@ -41,6 +41,10 @@ app.post('/api/todos', async (req, res) => {
       // Hint: Check if title is empty or undefined
       // Return 400 status with error message if invalid
 
+      if (!title || title.trim() === '') {
+         return res.status(400).json({success: false, message: 'Title is required'});
+      }
+
       const result = await pool.query(
          'INSERT INTO todos(title, completed) VALUES($1, $2) RETURNING *',
          [title, completed]
@@ -53,9 +57,38 @@ app.post('/api/todos', async (req, res) => {
 
 // BUG #3: Missing DELETE endpoint - but test expects it!
 // STUDENT TODO: Implement DELETE /api/todos/:id endpoint
+app.delete('/api/todos/:id', async (req, res) => {
+   try {
+      const id  = req.params.id;
+      const result = await pool.query('DELETE FROM todos WHERE id = $1', [id]);
+      //validation if there is no todo
+      if (result.rowCount === 0) {
+         return res.status(404).json({ message: 'Todo not found' });
+      }
+      res.status(204).end
+   }catch (err) {
+      res.status(500).json({ error: err.message });
+   }
+});
+
 
 // BUG #4: Missing PUT endpoint for updating todos
 // STUDENT TODO: Implement PUT /api/todos/:id endpoint
+app.put('/api/todos/:id', async (req, res) => {
+   try{
+      const id= req.params.id;
+      const newTitle = req.body.title;
+      const newCompleted = req.body.completed;
+      if (!newTitle || newTitle.trim() === '') {
+         return res.status(400).json({success: false, message: 'New title is required'});
+      }
+      const result = await pool.query('UPDATE FROM todos SET title = $1, completed = $2 WHERE id = $3 RETURNING *', [newTitle, newCompleted, id]);
+      res.json(result.rows[0]);
+   }catch (err) {
+      res.status(500).json({ error: err.message });
+      console.log('error')
+   }
+})
 
 const port = process.env.PORT || 8080;
 
