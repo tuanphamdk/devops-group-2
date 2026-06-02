@@ -11,7 +11,7 @@ app.use(express.json());
 // BUG #1: Wrong default password - doesn't match docker-compose!
 const pool = new Pool({
    user: process.env.DB_USER || 'devops',
-   host: process.env.DB_HOST || 'postgres',
+   host: process.env.DB_HOST || 'localhost',
    database: process.env.DB_NAME || 'mydb',
    password: process.env.DB_PASSWORD || 'devops123',
    port: process.env.DB_PORT || 5432,
@@ -19,6 +19,7 @@ const pool = new Pool({
 
 app.get('/health', (req, res) => {
    res.json({ status: 'healthy', version: '1.0.0' });
+   
 });
 
 // GET todos
@@ -28,6 +29,7 @@ app.get('/api/todos', async (req, res) => {
       res.json(result.rows);
    } catch (err) {
       res.status(500).json({ error: err.message });
+      console.log(err);
    }
 });
 
@@ -52,6 +54,7 @@ app.post('/api/todos', async (req, res) => {
       res.status(201).json(result.rows[0]);
    } catch (err) {
       res.status(500).json({ error: err.message });
+      console.log(err);
    }
 });
 
@@ -68,6 +71,8 @@ app.delete('/api/todos/:id', async (req, res) => {
       res.status(200).end()
    }catch (err) {
       res.status(500).json({ error: err.message });
+      console.log(err);
+      
    }
 });
 
@@ -87,11 +92,10 @@ app.put('/api/todos/:id', async (req, res) => {
       if (result.rowCount === 0) {
          return res.status(404).json({ error: 'Todo not found' });
       }
-
       res.json(result.rows[0]);
    }catch (err) {
       res.status(500).json({ error: err.message });
-      console.log('error')
+      console.log('error...')
    }
 })
 
@@ -99,14 +103,12 @@ const port = process.env.PORT || 8080;
 
 // BUG #5: Server starts even in test mode, causing port conflicts
 // STUDENT FIX: Only start server if NOT in test mode
-app.listen(port, () => {
-   console.log(`Backend running on port ${port}`);
-});
 if (process.env.NODE_ENV !== 'test'){
    app.listen(port, () => {
       console.log(`Backend running on port ${port}`);
    })
 }
+// thg tuan nua dem bat day commit lai
 
 // BUG #6: App not exported - tests can't import it!
 // STUDENT FIX: Export the app module
