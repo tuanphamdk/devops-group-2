@@ -103,6 +103,10 @@ const port = process.env.PORT || 8080;
 
 // BUG #5: Server starts even in test mode, causing port conflicts
 // STUDENT FIX: Only start server if NOT in test mode
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 if (process.env.NODE_ENV !== 'test'){
    app.listen(port, () => {
       console.log(`Backend running on port ${port}`);
