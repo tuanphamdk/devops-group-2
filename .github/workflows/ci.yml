@@ -35,10 +35,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
       - name: Initialize Database Schema
-        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./backend/database/database.sql
+        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./database/database.sql
 
       - name: Initialize Database Schema
-        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./backend/database/database.sql
+        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./database/database.sql
 
       - name: Install dependencies
         working-directory: ./backend
