@@ -40,6 +40,10 @@ jobs:
         run: npm test
         env:
           DB_HOST: localhost
+          DB_USER: devops       
+          DB_PASSWORD: devops123   
+          DB_NAME: devops    
+          DB_PORT: 5432
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
