@@ -2,7 +2,9 @@ name: CI Pipeline
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build_backend:
@@ -18,27 +20,26 @@ jobs:
       - working-directory: backend
         run: npm install
 
-  # test_backend:
-  #   needs: build_backend
-  #   runs-on: ubuntu-latest
+  test_backend:
+    needs: build_backend
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-  #     - working-directory: backend
-  #       run: npm install
+      - working-directory: backend
+        run: npm install
 
-  #     - working-directory: backend
-  #       run: npm test
+      - working-directory: backend
+        run: npm test
 
   build_frontend:
     needs: build_backend
 
-    # needs: test_backend
     runs-on: ubuntu-latest
 
     steps:
