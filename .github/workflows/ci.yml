@@ -35,7 +35,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
       - name: Initialize Database Schema
-        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./backend/database/database.sql
+        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./database/database.sql
 
       - name: Install dependencies
         working-directory: ./backend
@@ -71,11 +71,11 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest ./backend/Dockerfile
 
       - name: Build and push Frontend Docker image
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest ./backend/Dockerfile
