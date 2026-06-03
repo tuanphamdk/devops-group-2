@@ -49,6 +49,8 @@ RUN npm install --only=production
 
 COPY --from=builder /app .
 
+COPY database.sql /app/database.sql
+
 EXPOSE 8080
 
 CMD ["sh", "-c", "psql $DATABASE_URL -f /app/database.sql && npm start"]
