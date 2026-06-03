@@ -70,12 +70,14 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./backend
+          file: ./backend/Dockerfile  
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest ./backend/Dockerfile
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest
 
       - name: Build and push Frontend Docker image
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
+          file: ./frontend/Dockerfile 
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest ./backend/Dockerfile
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
