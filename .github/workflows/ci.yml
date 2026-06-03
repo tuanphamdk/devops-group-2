@@ -17,7 +17,7 @@ jobs:
         env:
           POSTGRES_USER: devops
           POSTGRES_PASSWORD: devops123
-          POSTGRES_DB: mydb
+          POSTGRES_DB: devops
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -34,9 +34,11 @@ jobs:
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      # Ép nạp cấu trúc bảng và dữ liệu mẫu thẳng vào Postgres thông qua cổng 5432
       - name: Initialize Database Schema
-        run: PGPASSWORD=devops123 psql -h localhost -U devops -d mydb -f ./backend/database/database.sql
+        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./backend/database/database.sql
+
+      - name: Initialize Database Schema
+        run: PGPASSWORD=devops123 psql -h localhost -U devops -d devops -f ./backend/database/database.sql
 
       - name: Install dependencies
         working-directory: ./backend
@@ -49,25 +51,25 @@ jobs:
           DB_HOST: localhost
           DB_USER: devops       
           DB_PASSWORD: devops123   
-          DB_NAME: mydb
+          DB_NAME: devops
           DB_PORT: 5432
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
+      #     password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Build and push Backend Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest
+      # - name: Build and push Backend Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: ./backend
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-backend:latest
 
-      - name: Build and push Frontend Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./frontend
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
+      # - name: Build and push Frontend Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: ./frontend
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
