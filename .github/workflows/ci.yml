@@ -2,55 +2,53 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build_backend:
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - working-directory: backend
-        run: npm install
-
-  test_backend:
-    needs: build_backend
-    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: devops
+          POSTGRES_PASSWORD: devops123
+          POSTGRES_DB: mydb
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '18'
+          cache: 'npm'
 
-      - working-directory: backend
+      - name: Install dependencies
         run: npm install
 
-      - working-directory: backend
+      - name: Run tests
         run: npm test
+        env:
+          DB_HOST: localhost
 
-  build_frontend:
-    needs: build_backend
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          node-version: 20
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - working-directory: frontend
-        run: npm install
-
-      - working-directory: frontend
-        run: npm run build
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2:latest
