@@ -41,6 +41,8 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache postgresql-client
+
 COPY --from=builder /app/package*.json ./
 
 RUN npm install --only=production
@@ -49,4 +51,4 @@ COPY --from=builder /app .
 
 EXPOSE 8080
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "psql $DATABASE_URL -f /app/database.sql && npm start"]
