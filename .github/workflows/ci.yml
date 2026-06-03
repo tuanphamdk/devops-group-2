@@ -17,11 +17,9 @@ jobs:
         env:
           POSTGRES_USER: devops
           POSTGRES_PASSWORD: devops123
-          POSTGRES_DB: mydb
+          POSTGRES_DB: devops
         ports:
           - 5432:5432
-        volumes:
-          - ${{ github.workspace }}/backend/database:/docker-entrypoint-initdb.d
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
