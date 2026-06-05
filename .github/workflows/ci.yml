@@ -46,7 +46,7 @@ jobs:
         run: npm test
         env:
           DB_HOST: localhost
-          DB_USER: devops       
+          DB_USER: devops        
           DB_PASSWORD: devops123   
           DB_NAME: devops
           DB_PORT: 5432
@@ -55,31 +55,6 @@ jobs:
     name: Push to Docker Hub
     runs-on: ubuntu-latest
     needs: build_and_test
-
-  deploy-to-server:
-    name: Deploy to Server
-    runs-on: ubuntu-latest
-    needs: push-to-docker
-
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            mkdir -p ~/devops-project
-            cd ~/devops-project
-            
-            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -O https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.prod.yml
-            
-            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
-            
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d
-            
-            docker image prune -f
 
     steps:
       - name: Checkout code
@@ -106,3 +81,18 @@ jobs:
           file: ./frontend/Dockerfile 
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
+
+  deploy:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: push-to-docker
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Backend Deployment
+        run: |
+          curl -X POST ${{ secrets.RENDER_BACKEND_HOOK }}
+          
+      - name: Trigger Frontend Deployment
+        run: |
+          curl -X POST ${{ secrets.RENDER_FRONTEND_HOOK }}
