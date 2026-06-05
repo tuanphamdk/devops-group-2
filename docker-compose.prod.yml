@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ${DOCKER_HUB_USERNAME}/devops-group-2-frontend:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    image: ${DOCKER_HUB_USERNAME}/devops-group-2-backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: devops
+      DB_USER: devops
+      DB_PASSWORD: devops123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_DB: devops
+      POSTGRES_USER: devops
+      POSTGRES_PASSWORD: devops123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  postgres_data:
