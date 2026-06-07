@@ -65,9 +65,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      
-      - name: Inject API URL for Frontend build
-        run: echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > ./frontend/.env
 
       - name: Build and push Backend Docker image
         uses: docker/build-push-action@v4
@@ -84,6 +81,8 @@ jobs:
           file: ./frontend/Dockerfile 
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops-group-2-frontend:latest
+          build-args: |
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
 
   deploy:
     name: Deploy to Render
