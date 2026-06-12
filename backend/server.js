@@ -31,24 +31,24 @@ app.get('/api/todos', async (req, res) => {
    }
 });
 
-// FIX #2: Added validation for empty title
-app.post('/api/todos', async (req, res) => {
-   try {
-      const { title, completed = false } = req.body;
+// // FIX #2: Added validation for empty title
+// app.post('/api/todos', async (req, res) => {
+//    try {
+//       const { title, completed = false } = req.body;
 
-      if (!title || title.trim() === '') {
-         return res.status(400).json({ error: 'Title is required' });
-      }
+//       if (!title || title.trim() === '') {
+//          return res.status(400).json({ error: 'Title is required' });
+//       }
 
-      const result = await pool.query(
-         'INSERT INTO todos(title, completed) VALUES($1, $2) RETURNING *',
-         [title, completed]
-      );
-      res.status(201).json(result.rows[0]);
-   } catch (err) {
-      res.status(500).json({ error: err.message });
-   }
-});
+//       const result = await pool.query(
+//          'INSERT INTO todos(title, completed) VALUES($1, $2) RETURNING *',
+//          [title, completed]
+//       );
+//       res.status(201).json(result.rows[0]);
+//    } catch (err) {
+//       res.status(500).json({ error: err.message });
+//    }
+// });
 
 // FIX #3: Implemented DELETE endpoint
 app.delete('/api/todos/:id', async (req, res) => {

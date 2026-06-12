@@ -35,9 +35,7 @@ RUN npm install
 
 COPY . .
 
-# ===========================================
-# THÊM 2 DÒNG NÀY ĐỂ MỞ CỬA NHẬN ĐƯỜNG LINK API
-# ===========================================
+
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
