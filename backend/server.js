@@ -31,7 +31,7 @@ app.get('/api/todos', async (req, res) => {
    }
 });
 
-// FIX #2: Added validation for empty title
+// // FIX #2: Added validation for empty title
 app.post('/api/todos', async (req, res) => {
    try {
       const { title, completed = false } = req.body;
